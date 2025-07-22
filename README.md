@@ -1,45 +1,110 @@
-🛡️ AWS Project: Configure VPC Flow Logs and Store Logs in S3 Using IAM Role
+ Configure VPC Flow Logs and Store Logs in S3 Using IAM Role
 
-📘 Overview
-This project demonstrates how to enable VPC Flow Logs to capture detailed information about the IP traffic going to and from network interfaces in an AWS VPC. These logs are then delivered securely to an Amazon S3 bucket using a custom IAM role with appropriate permissions.
+This project demonstrates how to configure **Amazon VPC Flow Logs** to monitor network traffic within a VPC and store the logs in an **Amazon S3 bucket** using an **IAM role** with appropriate permissions.
 
-This setup enables long-term storage, centralized logging, and network traffic monitoring — which is essential for security auditing, performance analysis, and compliance.
+---
 
-🎯 Objective
-✅ Enable VPC Flow Logs for a selected VPC.
-✅ Store the logs in an Amazon S3 bucket.
-✅ Use an IAM role to manage secure access between the VPC Flow Logs service and the bucket.
-✅ Analyze and understand the log data structure
+## 🧩 Project Objective
 
-📌 Real-World Use Case
-Imagine you run a company hosting applications inside a private network (VPC). To secure and audit your infrastructure, you want to track all incoming and outgoing network traffic. With VPC Flow Logs, you can now record every interaction in and out of your network. These logs are then sent to an S3 bucket where they are archived and available for analysis later.
+Enable flow logging on a VPC to capture IP traffic and deliver logs to an S3 bucket securely via IAM roles. This helps in network troubleshooting, auditing, and security analysis.
 
-🛠️ Step-by-Step Implementation
-🔹 Step 1: Create a VPC
-Created a VPC (vpc-flowlog-demo) in the N. Virginia region.
-Subnets and default components were auto-generated.
-🧠 Think of this as building a secure office building.
+---
 
-🔹 Step 2: Create an S3 Bucket
-Bucket Name: vpc-flow-logs-bucket-rushikesh123
-Disabled public access.
-Enabled versioning (optional).
-Folder structure auto-created by AWS Flow Logs: AWSLogs//vpcflowlogs/////
-yaml Copy Edit
+## ✅ Key Components
 
-🧠 Think of this as a digital locker that stores CCTV recordings.  
+- 🛡️ **VPC Flow Logs**: Captures IP traffic data in your VPC
+- 📦 **S3 Bucket**: Stores the generated flow log files
+- 🔐 **IAM Role**: Grants VPC service permission to write logs to S3
 
-🔹 Step 3: Create IAM Role for VPC Flow Logs
-Trusted entity: vpc-flow-logs.amazonaws.com
-IAM role name: vpc-flowlogs-to-s3-role
-Purpose: Allow AWS to assume this role and write logs into the S3 bucket.
+---
 
-💡 What I Learned
-1.How to capture and store network-level logs using VPC Flow Logs
+## 🛠️ Prerequisites
 
-2.How to secure S3 access using IAM roles and permissions
+- AWS account with admin or appropriate IAM permissions
+- An existing VPC in your region
+- AWS CLI configured OR AWS Console access
 
-3.How AWS services interact through roles and policies
+---
 
-4.Importance of logging for security, troubleshooting, and auditing
+## 📁 Project Structure
 
+```
+
+vpc-flowlogs-s3/
+├── create\_s3\_bucket.sh      # Script to create the S3 bucket
+├── create\_iam\_role.sh       # Script to create IAM Role and attach policies
+├── enable\_flow\_logs.sh      # Script to enable flow logs for a VPC
+└── README.md                # Project documentation
+
+````
+
+---
+
+## 🔧 Step-by-Step Setup
+
+### 1️⃣ Create an S3 Bucket
+
+Use the script or AWS Console to create a bucket:
+
+```bash
+bash create_s3_bucket.sh
+````
+
+Or manually:
+
+* Go to S3 → Create bucket
+* Name: `vpc-flow-logs-<your-unique-id>`
+* Enable versioning (optional)
+* Block all public access: ✅
+
+---
+
+### 2️⃣ Create IAM Role for Flow Logs
+
+```bash
+bash create_iam_role.sh
+```
+
+This script:
+
+* Creates an IAM role with a trust policy for `vpc-flow-logs.amazonaws.com`
+* Attaches `AmazonS3FullAccess` or a scoped custom policy
+
+---
+
+### 3️⃣ Enable VPC Flow Logs
+
+```bash
+bash enable_flow_logs.sh
+```
+
+Or from Console:
+
+* Navigate to VPC → Your VPC → **Flow Logs** → Create Flow Log
+* Destination: **Send to S3**
+* IAM Role: Select the role you created
+* Log Format: Default or custom
+* Log Group: Optional (if using CloudWatch instead)
+
+---
+
+## 📂 S3 Log Output
+
+Logs will be stored in the S3 bucket with a folder structure like:
+
+```
+s3://vpc-flow-logs-<id>/AWSLogs/<account-id>/vpcflowlogs/<region>/<year>/<month>/<day>/
+```
+
+Each file contains flow log records in plain text format.
+
+---
+
+## 🔍 Sample Flow Log Entry
+
+```
+version account-id interface-id srcaddr dstaddr srcport dstport protocol packets bytes start end action log-status
+2       123456789012 eni-abc123  10.0.0.1  10.0.0.2  443     1024     6        5       2000   1594736400 1594736460 ACCEPT OK
+```
+
+```
