@@ -1,16 +1,11 @@
-###IAM Permissions Policy:###
-
 json
-Copy
-Edit
 {
   "Version": "2012-10-17",
   "Statement": [
     {
-      "Sid": "AllowS3Put",
       "Effect": "Allow",
       "Action": "s3:PutObject",
-      "Resource": "arn:aws:s3:::vpc-flow-logs-bucket/*"
+      "Resource": "arn:aws:s3:::vpc-flow-logs-shruti/*"
     }
   ]
 }
